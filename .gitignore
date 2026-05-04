@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+candy/
+database.db
+static/uploads/*
+!static/uploads/.gitkeep

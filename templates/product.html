@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>{{ item['name'] }}</title>
+</head>
+<body>
+    <nav>
+        <a href="/" class="logo">BOUTIQUE NOIR</a>
+        <a href="/cart" class="cart-status">🛒 Cart ({{ cart_count }})</a>
+    </nav>
+
+    <div class="container">
+        <a href="/" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">← Back to Collection</a>
+        <div style="display: flex; gap: 60px; margin-top: 40px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 300px;">
+                <img src="{{ url_for('static', filename='uploads/' + item['img']) }}" style="width: 100%; border-radius: 20px; border: 1px solid #222;">
+            </div>
+            <div style="flex: 1; min-width: 300px; padding-top: 20px;">
+                <span style="text-transform: uppercase; letter-spacing: 2px; color: var(--accent-blue); font-weight: bold;">Exclusive Release</span>
+                <h1 style="font-size: 3.5rem; margin: 10px 0;">{{ item['name'] }}</h1>
+                <h2 style="color: var(--accent-green); font-size: 2rem; margin-bottom: 30px;">${{ item['price'] }}</h2>
+                <p style="color: var(--text-muted); font-size: 1.1rem; line-height: 1.8; margin-bottom: 40px;">
+                    This piece embodies contemporary elegance. Designed with precision and crafted from the finest materials, it offers unmatched comfort and a timeless silhouette.
+                </p>
+                <a href="{{ url_for('add_to_cart', item_id=item['id']) }}" class="btn-action" style="padding: 20px; font-size: 1.1rem; text-align: center;">Add to Cart</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

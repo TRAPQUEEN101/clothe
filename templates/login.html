@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Admin Login</title>
+</head>
+<body style="display: flex; align-items: center; justify-content: center; height: 100vh;">
+    <div class="product-card" style="width: 350px;">
+        <h2 style="margin-bottom: 20px;">Staff Access Only</h2>
+        <form method="POST">
+            <input type="password" name="password" placeholder="Enter Password" required>
+            <button type="submit" class="btn-action">Unlock Panel</button>
+        </form>
+        <p style="margin-top: 15px;"><a href="/" style="color: var(--text-muted); text-decoration: none;">← Back to Store</a></p>
+    </div>
+</body>
+</html>

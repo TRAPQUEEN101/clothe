@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Your Cart</title>
+</head>
+<body>
+    <nav>
+        <a href="/" class="logo">BOUTIQUE NOIR</a>
+        <a href="/" style="color: var(--text-muted); text-decoration: none;">Continue Shopping</a>
+    </nav>
+
+    <div class="container">
+        <h1>Shopping Cart</h1>
+        
+        {% if not display_items %}
+            <div style="text-align: center; padding: 50px;">
+                <p style="color: var(--text-muted);">Your cart is currently empty.</p>
+                <a href="/" class="btn-action" style="display: inline-block; width: auto; padding: 10px 30px;">Browse Collection</a>
+            </div>
+        {% else %}
+            <div class="checkout-container" style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px;">
+                <div style="background: var(--card-bg); padding: 20px; border-radius: 20px; border: 1px solid #222;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr style="color: var(--text-muted); border-bottom: 1px solid #333;">
+                            <th style="text-align: left; padding: 10px;">Item</th>
+                            <th>Qty</th>
+                            <th>Price</th>
+                            <th>Action</th>
+                        </tr>
+                        {% for item in display_items %}
+                        <tr style="border-bottom: 1px solid #222;">
+                            <td style="padding: 15px 10px;">{{ item.name }}</td>
+                            <td style="text-align: center;">{{ item.qty }}</td>
+                            <td style="text-align: center;">${{ item.subtotal }}</td>
+                            <td style="text-align: center;">
+                                <a href="{{ url_for('remove_from_cart', item_id=item.id) }}" 
+                                   style="color: #ff4444; text-decoration: none; font-size: 0.8rem; border: 1px solid #ff4444; padding: 5px 10px; border-radius: 5px;">
+                                   Remove
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    <div style="text-align: right; margin-top: 20px; font-size: 1.2rem;">
+                        Total: <span style="color: var(--accent-green); font-weight: bold;">${{ total }}</span>
+                    </div>
+                </div>
+
+                <div class="payment-box" style="background: #1a1a1a; padding: 25px; border-radius: 20px; border: 1px solid #333; height: fit-content;">
+                    <h3>Checkout</h3>
+                    <form action="/complete_order" method="POST">
+                        <input type="text" name="customer_name" placeholder="Full Name" required>
+                        
+                        <!-- Added Phone Number Field -->
+                        <input type="tel" name="customer_phone" placeholder="Phone Number (e.g. 0712...)" required 
+                               style="width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 10px; border: 1px solid #333; background: #222; color: white;">
+                        
+                        <div style="margin-bottom: 15px;">
+                            <button type="button" onclick="getLocation()" id="locBtn" style="background: #333; color: white; border: none; width: 100%; padding: 10px; border-radius: 10px; cursor: pointer;">
+                                📍 Share Delivery Location
+                            </button>
+                            <p id="locStatus" style="font-size: 0.7rem; color: var(--text-muted); margin-top: 5px;"></p>
+                        </div>
+
+                        <input type="hidden" name="lat" id="lat">
+                        <input type="hidden" name="lon" id="lon">
+
+                        <button type="submit" class="btn-action" style="background: var(--accent-green); border: none;">
+                            Order via WhatsApp
+                        </button>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+    function getLocation() {
+        const status = document.getElementById('locStatus');
+        if (!navigator.geolocation) {
+            status.textContent = "Not supported by browser";
+        } else {
+            status.textContent = "Locating...";
+            navigator.geolocation.getCurrentPosition((position) => {
+                document.getElementById('lat').value = position.coords.latitude;
+                document.getElementById('lon').value = position.coords.longitude;
+                status.textContent = "✅ Location ready";
+                document.getElementById('locBtn').style.border = "1px solid var(--accent-green)";
+            });
+        }
+    }
+    </script>
+</body>
+</html>

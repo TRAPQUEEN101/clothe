@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav>
+        <a href="/" class="logo">ADMIN PANEL</a>
+        <a href="/" style="color: white; text-decoration: none;">View Store</a>
+    </nav>
+    <div class="container" style="max-width: 600px;">
+        <h2>Add New Product</h2>
+        <form method="POST" enctype="multipart/form-data">
+            <label>Product Name</label>
+            <input type="text" name="name" placeholder="e.g. Black Silk Shirt" required>
+            <label>Price ($)</label>
+            <input type="number" step="0.01" name="price" placeholder="49.99" required>
+            <label>Product Image</label>
+            <input type="file" name="image" required>
+            <button type="submit" class="btn-add" style="width: 100%; cursor: pointer;">Upload Product</button>
+        </form>
+    </div>
+</body>
+</html>
