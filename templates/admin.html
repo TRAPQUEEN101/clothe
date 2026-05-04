@@ -1,25 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin Panel</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Admin Dashboard</title>
 </head>
-<body>
-    <nav>
-        <a href="/" class="logo">ADMIN PANEL</a>
-        <a href="/" style="color: white; text-decoration: none;">View Store</a>
+<body style="background: #000; color: #fff; font-family: sans-serif; padding: 20px;">
+    <nav style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+        <h2>Boutique Admin</h2>
+        <a href="/" style="color: #888; text-decoration: none;">View Shop</a>
     </nav>
-    <div class="container" style="max-width: 600px;">
-        <h2>Add New Product</h2>
-        <form method="POST" enctype="multipart/form-data">
-            <label>Product Name</label>
-            <input type="text" name="name" placeholder="e.g. Black Silk Shirt" required>
-            <label>Price ($)</label>
-            <input type="number" step="0.01" name="price" placeholder="49.99" required>
-            <label>Product Image</label>
-            <input type="file" name="image" required>
-            <button type="submit" class="btn-add" style="width: 100%; cursor: pointer;">Upload Product</button>
+
+    <div style="max-width: 800px; margin: 0 auto; background: #111; padding: 30px; border-radius: 20px; border: 1px solid #222;">
+        <h3>Add New Item</h3>
+        <form action="/admin" method="POST" enctype="multipart/form-data">
+            <input type="text" name="name" placeholder="Item Name" required style="width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 10px; border: 1px solid #333; background: #222; color: white;">
+            <input type="number" step="0.01" name="price" placeholder="Price" required style="width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 10px; border: 1px solid #333; background: #222; color: white;">
+            <input type="file" name="image" required style="margin-bottom: 20px; display: block;">
+            <button type="submit" style="background: #00ff88; color: black; border: none; padding: 15px 30px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%;">Upload to Shop</button>
         </form>
+
+        <hr style="margin: 40px 0; border: 0; border-top: 1px solid #333;">
+
+        <h3>Manage Inventory</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="color: #888; border-bottom: 1px solid #333;">
+                    <th style="padding: 10px; text-align: left;">Item</th>
+                    <th style="padding: 10px;">Price</th>
+                    <th style="padding: 10px;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr style="border-bottom: 1px solid #222;">
+                    <td style="padding: 15px 10px;">{{ item.name }}</td>
+                    <td style="padding: 15px 10px; text-align: center;">${{ item.price }}</td>
+                    <td style="padding: 15px 10px; text-align: center;">
+                        <a href="{{ url_for('delete_item', item_id=item.id) }}" 
+                           onclick="return confirm('Are you sure?')"
+                           style="color: #ff4444; text-decoration: none; border: 1px solid #ff4444; padding: 5px 10px; border-radius: 5px; font-size: 0.8rem;">
+                           Delete
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </body>
 </html>

@@ -4,11 +4,9 @@ from collections import Counter
 from functools import wraps
 
 app = Flask(__name__)
-# FIXED: You MUST have a secret key for sessions to work
 app.secret_key = 'anyona_secret_key_123' 
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
-# --- SECURITY CONFIG ---
 ADMIN_PASSWORD = "Anyona" 
 
 def login_required(f):
@@ -24,8 +22,6 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-# --- USER ROUTES ---
-
 @app.route('/')
 def index():
     conn = get_db_connection()
@@ -39,8 +35,6 @@ def product_detail(item_id):
     item = conn.execute("SELECT * FROM clothes WHERE id = ?", (item_id,)).fetchone()
     conn.close()
     return render_template('product.html', item=item, cart_count=len(session.get('cart', [])))
-
-# --- SHOPPING CART ROUTES ---
 
 @app.route('/add_to_cart/<int:item_id>')
 def add_to_cart(item_id):
@@ -77,41 +71,26 @@ def cart():
         qty = counts[r['id']]
         subtotal = r['price'] * qty
         total += subtotal
-        display_items.append({
-            'id': r['id'], 
-            'name': r['name'], 
-            'price': r['price'], 
-            'qty': qty, 
-            'subtotal': subtotal
-        })
+        display_items.append({'id': r['id'], 'name': r['name'], 'price': r['price'], 'qty': qty, 'subtotal': subtotal})
         
     return render_template('cart.html', display_items=display_items, total=total)
-
-# --- ADMIN ROUTES ---
 
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
     if request.method == 'POST':
-        # Added .strip() to remove accidental spaces from the input
         input_password = request.form.get('password', '').strip()
-        
         if input_password == ADMIN_PASSWORD:
-            session.permanent = True # Keep session alive
+            session.permanent = True
             session['admin_logged_in'] = True
             return redirect(url_for('admin'))
         else:
-            flash("Invalid Password")
             return "<h1>Access Denied</h1>", 403
     return render_template('login.html')
-
-@app.route('/admin/logout')
-def admin_logout():
-    session.clear() # Clear everything on logout
-    return redirect(url_for('index'))
 
 @app.route('/admin', methods=['GET', 'POST'])
 @login_required
 def admin():
+    conn = get_db_connection()
     if request.method == 'POST':
         name = request.form['name']
         price = request.form['price']
@@ -120,16 +99,27 @@ def admin():
             if not os.path.exists(app.config['UPLOAD_FOLDER']):
                 os.makedirs(app.config['UPLOAD_FOLDER'])
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
-            with get_db_connection() as conn:
-                conn.execute("INSERT INTO clothes (name, price, img) VALUES (?, ?, ?)", (name, price, file.filename))
-        return redirect(url_for('index'))
-    return render_template('admin.html')
+            conn.execute("INSERT INTO clothes (name, price, img) VALUES (?, ?, ?)", (name, price, file.filename))
+            conn.commit()
+        return redirect(url_for('admin'))
+    
+    items = conn.execute("SELECT * FROM clothes").fetchall()
+    conn.close()
+    return render_template('admin.html', items=items)
 
-# --- CHECKOUT ---
+@app.route('/admin/delete/<int:item_id>')
+@login_required
+def delete_item(item_id):
+    conn = get_db_connection()
+    conn.execute("DELETE FROM clothes WHERE id = ?", (item_id,))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('admin'))
 
 @app.route('/complete_order', methods=['POST'])
 def complete_order():
-    customer_name = request.form.get('customer_name')
+    name = request.form.get('customer_name')
+    phone = request.form.get('customer_phone')
     lat = request.form.get('lat')
     lon = request.form.get('lon')
     
@@ -140,22 +130,20 @@ def complete_order():
     conn.close()
 
     whatsapp_number = "+254702872541" 
-    message = f"New Order from: *{customer_name}*\n\n"
+    message = f"🛍️ *New Order Detail*\n👤 *Name:* {name}\n📞 *Phone:* {phone}\n\n🛒 *Items:*\n"
+    
     total = 0
     for row in rows:
         qty = counts[row['id']]
         total += row['price'] * qty
         message += f"• {row['name']} (x{qty})\n"
     
-    message += f"\n*Total: ${total}*"
-    
+    message += f"\n💰 *Total: ${total}*"
     if lat and lon:
-        message += f"\n\n📍 *Delivery Location:* https://www.google.com/maps?q={lat},{lon}"
+        message += f"\n📍 *Map:* https://www.google.com/maps?q={lat},{lon}"
 
     session.pop('cart', None)
     return redirect(f"https://wa.me/{whatsapp_number}?text={urllib.parse.quote(message)}")
-
-# --- START SERVER ---
 
 if __name__ == '__main__':
     with get_db_connection() as conn:
