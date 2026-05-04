@@ -23,7 +23,7 @@
                 <a href="{{ url_for('product_detail', item_id=item['id']) }}" style="text-decoration: none;">
                     <img src="{{ url_for('static', filename='uploads/' + item['img']) }}">
                     <h3>{{ item['name'] }}</h3>
-                    <div class="price">${{ item['price'] }}</div>
+                    <div class="price">Ksh{{ item['price'] }}</div>
                 </a>
                 <a href="{{ url_for('add_to_cart', item_id=item['id']) }}" class="btn-action">Add to Cart</a>
             </div>
