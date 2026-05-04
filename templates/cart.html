@@ -32,7 +32,7 @@
                         <tr style="border-bottom: 1px solid #222;">
                             <td style="padding: 15px 10px;">{{ item.name }}</td>
                             <td style="text-align: center;">{{ item.qty }}</td>
-                            <td style="text-align: center;">${{ item.subtotal }}</td>
+                            <td style="text-align: center;">Ksh{{ item.subtotal }}</td>
                             <td style="text-align: center;">
                                 <a href="{{ url_for('remove_from_cart', item_id=item.id) }}" 
                                    style="color: #ff4444; text-decoration: none; font-size: 0.8rem; border: 1px solid #ff4444; padding: 5px 10px; border-radius: 5px;">
